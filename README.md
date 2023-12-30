@@ -1,5 +1,5 @@
 # Unity_VirtualTexture
-Virtual texture system for Unity
+Virtual texture system develop based on Unity 2022.3.16f1.
 
 ## TODO List:
 ### 1. Complete the basic virtual texture system

@@ -8,6 +8,7 @@ namespace VirtualTexture.Runtime
 
     public class PageTable
     {
+        public const int InvalidTileIndex = 0;
         public PageTable(int pageCountX, int pageCountY)
         {
             Assert.IsTrue(Mathf.IsPowerOfTwo(pageCountX));
@@ -16,13 +17,13 @@ namespace VirtualTexture.Runtime
             this.pageCountY = pageCountY;
             this.mipmapCount = Mathf.RoundToInt(Mathf.Log(Mathf.Min(pageCountX, pageCountY), 2));
             
-            tables = new Color32[mipmapCount][][];
+            tables = new int[mipmapCount][][];
             for (int i = 0; i < mipmapCount; i++)
             {
-                tables[i] = new Color32[pageCountY >> i][];
+                tables[i] = new int[pageCountY >> i][];
                 for (int j = 0; j < pageCountY >> i; j++)
                 {
-                    tables[i][j] = new Color32[pageCountX >> i];
+                    tables[i][j] = new int[pageCountX >> i];
                 }
             }
         }
@@ -39,6 +40,21 @@ namespace VirtualTexture.Runtime
 
         public readonly int mipmapCount;
         
-        private readonly Color32[][][] tables;
+        private readonly int[][][] tables;
+        
+        public void Active(int x, int y, int mip, int tileIndex)
+        {
+            tables[mip][y][x] = tileIndex;
+        }
+        
+        public void Deactive(int x, int y, int mip)
+        {
+            tables[mip][y][x] = InvalidTileIndex;
+        }
+        
+        public int Get(int x, int y, int mip)
+        {
+            return tables[mip][y][x];
+        }
     }
 }

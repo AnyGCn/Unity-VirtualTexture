@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace VirtualTexture.Runtime
 {
     using System;
@@ -46,6 +48,7 @@ namespace VirtualTexture.Runtime
             }
 
             _pageTable = new PageTable(this.pageCountX, this.pageCountY);
+            _activeTiles = new Dictionary<int, ActiveTileInfo>(this.tileCapacity);
             _lruCache = new LRUCache(this.tileCapacity);
             InitializePageTexture();
             InitializePhysicsTexture();
@@ -126,6 +129,7 @@ namespace VirtualTexture.Runtime
         private RenderTexture _physicsRenderTextureArray;
         private PageTable _pageTable;
         private LRUCache _lruCache;
+        private Dictionary<int, ActiveTileInfo> _activeTiles;
         
         /// <summary>
         /// Whether Unity stores an additional copy of this texture's pixel data in CPU-addressable memory.
@@ -160,6 +164,59 @@ namespace VirtualTexture.Runtime
         internal Texture PhysicsTexture => supportsForDirectRendering ? _physicsRenderTextureArray : _physicsTextureArray;
         internal Vector4 PhysicsTextureInfo { get; private set; }
 
+        public void Active(int x, int y, int mip)
+        {
+            int tileIndex = _pageTable.Get(x, y, mip);
+            if (tileIndex == PageTable.InvalidTileIndex)
+            {
+                tileIndex = _lruCache.Require();
+                if (_activeTiles.TryGetValue(tileIndex, out var info))
+                {
+                    _pageTable.Deactive(info.x, info.y, info.mip);
+                }
+                
+                Active(tileIndex, x, y, mip);
+            }
+            else
+            {
+                _lruCache.Touch(tileIndex);
+            }
+        }
+        
+        public void Deactive(int x, int y, int mip)
+        {
+            int tileIndex = _pageTable.Get(x, y, mip);
+            if (tileIndex != PageTable.InvalidTileIndex)
+            {
+                _pageTable.Deactive(x, y, mip);
+                _activeTiles.Remove(tileIndex);
+            }
+        }
+
+        public void DeactiveAll()
+        {
+            foreach (var info in _activeTiles.Values)
+            {
+                _pageTable.Deactive(info.x, info.y, info.mip);
+            }
+            
+            _activeTiles.Clear();
+            _lruCache.Reset();
+        }
+        
+        private void Active(int tileIndex, int x, int y, int mip)
+        {
+            _activeTiles[tileIndex] = new ActiveTileInfo
+            {
+                x = x,
+                y = y,
+                mip = mip,
+                tileIndex = tileIndex
+            };
+            
+            _pageTable.Active(x, y, mip, tileIndex);
+        }
+        
         /// <summary>
         /// Count of tiles for a given mip level in X direction (Read Only).
         /// </summary>
@@ -266,7 +323,15 @@ namespace VirtualTexture.Runtime
             }
         }
 
-        public class Constants
+        private struct ActiveTileInfo
+        {
+            public int x;
+            public int y;
+            public int mip;
+            public int tileIndex;
+        }
+        
+        private static class Constants
         {
             public const string DefaultName = "VirtualTexture";
             public const string PageTextureSuffix = "_Page";

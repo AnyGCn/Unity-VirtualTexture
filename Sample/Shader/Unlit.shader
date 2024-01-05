@@ -21,11 +21,6 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
 
         // Editmode props
         _QueueOffset("Queue offset", Float) = 0.0
-
-        // ObsoleteProperties
-        [HideInInspector] _MainTex("BaseMap", 2D) = "white" {}
-        [HideInInspector] _Color("Base Color", Color) = (0.5, 0.5, 0.5, 1)
-        [HideInInspector] _SampleGI("SampleGI", float) = 0.0 // needed from bakedlit
     }
 
     SubShader
@@ -41,20 +36,15 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
 
         // -------------------------------------
         // Render State Commands
-        Blend [_SrcBlend][_DstBlend], [_SrcBlendAlpha][_DstBlendAlpha]
-        ZWrite [_ZWrite]
-        Cull [_Cull]
+        Blend Off
+        ZWrite On
+        Cull Back
 
         Pass
         {
             Name "Unlit"
-
-            // -------------------------------------
-            // Render State Commands
-            AlphaToMask[_AlphaToMask]
-
             HLSLPROGRAM
-            #pragma target 2.0
+            #pragma target 4.5
 
             // -------------------------------------
             // Shader Stages
@@ -62,29 +52,9 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             #pragma fragment UnlitPassFragment
 
             // -------------------------------------
-            // Material Keywords
-            #pragma shader_feature_local_fragment _SURFACE_TYPE_TRANSPARENT
-            #pragma shader_feature_local_fragment _ALPHATEST_ON
-            #pragma shader_feature_local_fragment _ALPHAMODULATE_ON
-
-            // -------------------------------------
-            // Unity defined keywords
-            #pragma multi_compile_fog
-            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
-            #pragma multi_compile_fragment _ _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
-            #pragma multi_compile _ DEBUG_DISPLAY
-            #pragma multi_compile_fragment _ LOD_FADE_CROSSFADE
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
-
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
-
-            // -------------------------------------
             // Includes
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitForwardPass.hlsl"
+            #include "UnlitInput.hlsl"
+            #include "UnlitForwardPass.hlsl"
             ENDHLSL
         }
 
@@ -123,15 +93,10 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
 
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
-
             // -------------------------------------
             // Includes
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitGBufferPass.hlsl"
+            #include "UnlitInput.hlsl"
+            #include "UnlitGBufferPass.hlsl"
             ENDHLSL
         }
 
@@ -149,7 +114,7 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             ColorMask R
 
             HLSLPROGRAM
-            #pragma target 2.0
+            #pragma target 4.5
 
             // -------------------------------------
             // Shader Stages
@@ -157,21 +122,8 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             #pragma fragment DepthOnlyFragment
 
             // -------------------------------------
-            // Material Keywords
-            #pragma shader_feature_local _ALPHATEST_ON
-
-            // -------------------------------------
-            // Unity defined keywords
-            #pragma multi_compile_fragment _ LOD_FADE_CROSSFADE
-
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
-
-            // -------------------------------------
             // Includes
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
+            #include "UnlitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
             ENDHLSL
         }
@@ -189,7 +141,7 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             ZWrite On
 
             HLSLPROGRAM
-            #pragma target 2.0
+            #pragma target 4.5
 
             // -------------------------------------
             // Shader Stages
@@ -197,24 +149,9 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             #pragma fragment DepthNormalsFragment
 
             // -------------------------------------
-            // Material Keywords
-            #pragma shader_feature_local _ALPHATEST_ON
-
-            // -------------------------------------
-            // Universal Pipeline keywords
-            #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT // forward-only variant
-            #pragma multi_compile_fragment _ LOD_FADE_CROSSFADE
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
-
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
-
-            // -------------------------------------
             // Includes
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitDepthNormalsPass.hlsl"
+            #include "UnlitInput.hlsl"
+            #include "UnlitDepthNormalsPass.hlsl"
             ENDHLSL
         }
 
@@ -232,7 +169,7 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             Cull Off
 
             HLSLPROGRAM
-            #pragma target 2.0
+            #pragma target 4.5
 
             // -------------------------------------
             // Shader Stages
@@ -245,8 +182,8 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
 
             // -------------------------------------
             // Includes
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitMetaPass.hlsl"
+            #include "UnlitInput.hlsl"
+            #include "UnlitMetaPass.hlsl"
             ENDHLSL
         }
     }

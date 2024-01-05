@@ -10,7 +10,7 @@
                                 float4 name##_PageInfo;                 /* x: pageWidth, y: pageHeight, z: offsetX, w: offsetY  */          \
                                 float4 name##_PhysicsInfo;              /* x: tileWidth, y: tileHeight, z: tileCountX, w: tileCountY  */    \
 
-#define SAMPLE_VIRTUAL_TEXTURE(name, uv)    sampleVirtualTexture(TEXTURE2D_ARGS(name##_Page, sampler_##name##_Page), TEXTURE2D_ARRAY_ARGS(name##_Physics, sampler_##name##_Physics), name##_PageInfo, name##_PhysicsInfo, uv, mipBias)
+#define SAMPLE_VIRTUAL_TEXTURE(name, uv)    sampleVirtualTexture(TEXTURE2D_ARGS(name##_Page, sampler_##name##_Page), TEXTURE2D_ARRAY_ARGS(name##_Physics, sampler_##name##_Physics), name##_PageInfo, name##_PhysicsInfo, uv)
 
 float GetMipMapLevel(float2 nonNormalizedUVCoordinate)
 {
@@ -32,7 +32,7 @@ half4 sampleVirtualTexture(TEXTURE2D_PARAM(pageTexture, sampler_pageTexture), TE
     half4 pageColor = SAMPLE_TEXTURE2D_LOD(pageTexture, sampler_pageTexture, uv, uint(mipLevel));         // x: tileIndexX, y: tileIndexY, z: mipCount, w: offsetY
 
     const uint tileIndex = round(pageColor.x + pageColor.y * physicsInfo.z);
-    float2 tileUV = uv * (round(pageInfo.xy) >> pageColor.z);
+    float2 tileUV = uv * (uint2(pageInfo.xy) >> uint(pageColor.z));
     float4 physicsColor = SAMPLE_TEXTURE2D_ARRAY_LOD(physicsTexture, sampler_physicsTexture, tileUV, tileIndex, frac(mipLevel));
     return physicsColor;
 }

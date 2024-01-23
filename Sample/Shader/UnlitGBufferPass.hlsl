@@ -1,7 +1,6 @@
 #ifndef URP_UNLIT_GBUFFER_PASS_INCLUDED
 #define URP_UNLIT_GBUFFER_PASS_INCLUDED
 
-#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Unlit.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/UnityGBuffer.hlsl"
 #if defined(LOD_FADE_CROSSFADE)
     #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/LODCrossFade.hlsl"
@@ -52,9 +51,6 @@ Varyings UnlitPassVertex(Attributes input)
 
     VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
     output.positionCS = vertexInput.positionCS;
-
-    output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
-
     VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS);
     output.normalWS = normalInput.normalWS;
 
@@ -68,10 +64,8 @@ FragmentOutput UnlitPassFragment(Varyings input)
 
     half2 uv = input.uv;
     half4 texColor = SampleAlbedoAlpha(uv, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
-    half3 color = texColor.rgb * _BaseColor.rgb;
-    half alpha = texColor.a * _BaseColor.a;
-
-    alpha = AlphaDiscard(alpha, _Cutoff);
+    half3 color = texColor.rgb;
+    half alpha = texColor.a;
     color = AlphaModulate(color, alpha);
 
 #ifdef LOD_FADE_CROSSFADE

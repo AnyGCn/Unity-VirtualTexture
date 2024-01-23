@@ -4,7 +4,7 @@ namespace VirtualTexture.Editor
     using UnityEngine;
     using TestRunning;
 
-    [CustomEditor(typeof(VirtualTextureConsole))]
+    [CustomEditor(typeof(VTUnlitTest))]
     public class VirtualTextureConsoleEditor : Editor
     {
         public override void OnInspectorGUI()

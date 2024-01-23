@@ -2,9 +2,10 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
 {
     Properties
     {
-        [MainTexture] _BaseMap("Texture", 2D) = "white" {}
-        [MainColor] _BaseColor("Color", Color) = (1, 1, 1, 1)
-        _Cutoff("AlphaCutout", Range(0.0, 1.0)) = 0.5
+        Simple_Physics("Physics Texture", 2DArray) = "white" {}
+        Simple_PhysicsInfo("Physics Info", Vector) = (0, 0, 0, 0)
+        Simple_Page("Page Texture", 2D) = "black"
+        Simple_PageInfo("Page Info", Vector) = (0, 0, 0, 0)
 
         // BlendMode
         _Surface("__surface", Float) = 0.0
@@ -42,7 +43,12 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
 
         Pass
         {
-            Name "Unlit"
+            Name "Universal Forward"
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
             HLSLPROGRAM
             #pragma target 4.5
 
@@ -50,6 +56,7 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             // Shader Stages
             #pragma vertex UnlitPassVertex
             #pragma fragment UnlitPassFragment
+            #pragma enable_d3d11_debug_symbols
 
             // -------------------------------------
             // Includes
@@ -152,38 +159,6 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
             // Includes
             #include "UnlitInput.hlsl"
             #include "UnlitDepthNormalsPass.hlsl"
-            ENDHLSL
-        }
-
-        // This pass it not used during regular rendering, only for lightmap baking.
-        Pass
-        {
-            Name "Meta"
-            Tags
-            {
-                "LightMode" = "Meta"
-            }
-
-            // -------------------------------------
-            // Render State Commands
-            Cull Off
-
-            HLSLPROGRAM
-            #pragma target 4.5
-
-            // -------------------------------------
-            // Shader Stages
-            #pragma vertex UniversalVertexMeta
-            #pragma fragment UniversalFragmentMetaUnlit
-
-            // -------------------------------------
-            // Unity defined keywords
-            #pragma shader_feature EDITOR_VISUALIZATION
-
-            // -------------------------------------
-            // Includes
-            #include "UnlitInput.hlsl"
-            #include "UnlitMetaPass.hlsl"
             ENDHLSL
         }
     }

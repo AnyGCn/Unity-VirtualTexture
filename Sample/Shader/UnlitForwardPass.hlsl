@@ -2,7 +2,6 @@
 #ifndef URP_UNLIT_FORWARD_PASS_INCLUDED
 #define URP_UNLIT_FORWARD_PASS_INCLUDED
 
-#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Unlit.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
 struct Attributes
@@ -43,7 +42,7 @@ Varyings UnlitPassVertex(Attributes input)
     Varyings output = (Varyings)0;
     VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
     output.positionCS = vertexInput.positionCS;
-    output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
+    output.uv = input.uv;
     return output;
 }
 
@@ -54,7 +53,7 @@ void UnlitPassFragment(
 {
     half2 uv = input.uv;
     half4 texColor = SAMPLE_VIRTUAL_TEXTURE(Simple, uv);
-    half3 color = texColor.rgb * _BaseColor.rgb;
+    half3 color = texColor.rgb;
     outColor = half4(color.rgb, 1.0f);
 }
 

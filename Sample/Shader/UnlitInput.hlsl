@@ -5,10 +5,8 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
 
 CBUFFER_START(UnityPerMaterial)
-    float4 _BaseMap_ST;
-    half4 _BaseColor;
-    half _Cutoff;
-    half _Surface;
+    half4 Simple_PageInfo;
+    half4 Simple_PhysicsInfo;
 CBUFFER_END
 
 VIRTUAL_TEXTURE(Simple);

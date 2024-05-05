@@ -1,8 +1,7 @@
-namespace VirtualTexture.Editor
+namespace VirtualTexture.Sample
 {
     using UnityEditor;
     using UnityEngine;
-    using TestRunning;
 
     [CustomEditor(typeof(VTUnlitTest))]
     public class VirtualTextureConsoleEditor : Editor

@@ -2,10 +2,10 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
 {
     Properties
     {
-        Simple_Physics("Physics Texture", 2DArray) = "white" {}
-        Simple_PhysicsInfo("Physics Info", Vector) = (0, 0, 0, 0)
-        Simple_Page("Page Texture", 2D) = "black"
-        Simple_PageInfo("Page Info", Vector) = (0, 0, 0, 0)
+        [NoScaleOffset]Simple_Physics("Physics Texture", 2DArray) = "white" {}
+        [HideInInspector] Simple_PhysicsInfo("Physics Info", Vector) = (0, 0, 0, 0)
+        [NoScaleOffset]Simple_Page("Page Texture", 2D) = "black"
+        [HideInInspector] Simple_PageInfo("Page Info", Vector) = (0, 0, 0, 0)
 
         // BlendMode
         _Surface("__surface", Float) = 0.0
@@ -164,4 +164,5 @@ Shader "Universal Render Pipeline/Virtual Texture/Unlit"
     }
 
     FallBack "Hidden/Universal Render Pipeline/FallbackError"
+    CustomEditor "VirtualTexture.Sample.VTUnlitShaderGUI"
 }

@@ -30,10 +30,10 @@ float GetMipMapLevel(float2 nonNormalizedUVCoordinate)
 half4 sampleVirtualTexture(TEXTURE2D_PARAM(pageTexture, sampler_pageTexture), TEXTURE2D_ARRAY_PARAM(physicsTexture, sampler_physicsTexture), float4 pageInfo, float4 physicsInfo, float2 uv)
 {
     const float2 virtualTextureSize = pageInfo.xy * physicsInfo.xy;
-    const float mipLevel = min(pageInfo.z, GetMipMapLevel(uv * virtualTextureSize));
+    const float mipLevel = min(pageInfo.z - 1, GetMipMapLevel(uv * virtualTextureSize));
     uint4 pageColor = round(SAMPLE_TEXTURE2D_LOD(pageTexture, sampler_pageTexture, uv, uint(mipLevel)) * 255);         // x: tileIndexX, y: tileIndexY, z: mipCount, w: offsetY
 
-    const uint tileIndex = round(pageColor.x + pageColor.y * physicsInfo.z);
+    const uint tileIndex = round(pageColor.w);
     float2 tileUV = uv * (uint2(pageInfo.xy) >> pageColor.z);
     float4 physicsColor = SAMPLE_TEXTURE2D_ARRAY_LOD(physicsTexture, sampler_physicsTexture, tileUV, tileIndex, frac(mipLevel));
     return physicsColor;

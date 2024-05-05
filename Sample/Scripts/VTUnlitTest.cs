@@ -1,7 +1,6 @@
-using System;
-
-namespace VirtualTexture.TestRunning
+namespace VirtualTexture.Sample
 {
+    using System;
     using UnityEngine;
 
     [ExecuteAlways]

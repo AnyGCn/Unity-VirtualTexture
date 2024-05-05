@@ -14,6 +14,7 @@ struct Varyings
 {
     float2 uv : TEXCOORD0;
     float4 positionCS : SV_POSITION;
+    float3 positionWS : TEXCOORD1;
 };
 
 void InitializeInputData(Varyings input, out InputData inputData)
@@ -42,6 +43,7 @@ Varyings UnlitPassVertex(Attributes input)
     Varyings output = (Varyings)0;
     VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
     output.positionCS = vertexInput.positionCS;
+    output.positionWS = vertexInput.positionWS;
     output.uv = input.uv;
     return output;
 }
@@ -52,8 +54,9 @@ void UnlitPassFragment(
 )
 {
     half2 uv = input.uv;
-    half4 texColor = SAMPLE_VIRTUAL_TEXTURE(Simple, uv);
+    half4 texColor = SAMPLE_VIRTUAL_TEXTURE(Simple, (input.positionWS.xz + 128) / 256);
     half3 color = texColor.rgb;
+    // color = SAMPLE_TEXTURE2D_LOD(Simple_Page, sampler_Simple_Page, (input.positionWS.xz + 128.0f) / 256, 0);
     outColor = half4(color.rgb, 1.0f);
 }
 

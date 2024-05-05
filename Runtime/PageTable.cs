@@ -1,10 +1,10 @@
-using UnityEngine.Assertions;
-
 namespace VirtualTexture.Runtime
 {
     using System.Collections;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
     using UnityEngine;
+    using UnityEngine.Assertions;
 
     public class PageTable
     {
@@ -15,7 +15,7 @@ namespace VirtualTexture.Runtime
             Assert.IsTrue(Mathf.IsPowerOfTwo(pageCountY));
             this.pageCountX = pageCountX;
             this.pageCountY = pageCountY;
-            this.mipmapCount = Mathf.RoundToInt(Mathf.Log(Mathf.Min(pageCountX, pageCountY), 2));
+            this.mipmapCount = Mathf.RoundToInt(Mathf.Log(Mathf.Min(pageCountX, pageCountY), 2)) + 1;
             
             tables = new int[mipmapCount][][];
             for (int i = 0; i < mipmapCount; i++)
@@ -42,16 +42,19 @@ namespace VirtualTexture.Runtime
         
         private readonly int[][][] tables;
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Active(int x, int y, int mip, int tileIndex)
         {
             tables[mip][y][x] = tileIndex;
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deactive(int x, int y, int mip)
         {
             tables[mip][y][x] = InvalidTileIndex;
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Get(int x, int y, int mip)
         {
             return tables[mip][y][x];
